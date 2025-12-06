@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Todo List</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    #taskList {
+      list-style-type: none;
+      padding: 0;
+      width: 60%;
+      margin: auto;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: green;
+    }
+
+    button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Enhanced Todo List</h1>
+
+  <!-- Input for adding new task -->
+  <input type="text" id="taskInput" placeholder="Enter a new task">
+  <button id="addTaskBtn">Add Task</button>
+  <br><br>
+
+  <!-- Search Input -->
+  <input type="text" id="searchInput" placeholder="Search tasks...">
+  <br><br>
+
+  <!-- Task List -->
+  <ul id="taskList"></ul>
+
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const addTaskBtn = document.getElementById("addTaskBtn");
+    const searchInput = document.getElementById("searchInput");
+    const taskList = document.getElementById("taskList");
+
+    let tasks = [];
+
+    // Load tasks from localStorage on page load
+    window.addEventListener("load", () => {
+      const storedTasks = JSON.parse(localStorage.getItem("todos"));
+      if (storedTasks) {
+        tasks = storedTasks;
+        renderTasks(tasks);
+      }
+    });
+
+    // Add Task
+    addTaskBtn.addEventListener("click", () => {
+      const text = taskInput.value.trim();
+      if (text === "") {
+        alert("Task cannot be empty!");
+        return;
+      }
+
+      const newTask = {
+        id: Date.now(), // unique ID
+        text: text,
+        completed: false,
+      };
+
+      tasks.push(newTask);
+      saveTasks();
+      renderTasks(tasks);
+      taskInput.value = "";
+    });
+
+    // Render function to display tasks
+    function renderTasks(taskArray) {
+      taskList.innerHTML = ""; // Clear display
+
+      taskArray.forEach(task => {
+        const li = document.createElement("li");
+
+        // Text element
+        const span = document.createElement("span");
+        span.textContent = task.text;
+
+        // Apply completed visual style
+        if (task.completed) {
+          span.classList.add("completed");
+        }
+
+        // Toggle completion on click
+        span.addEventListener("click", () => {
+          task.completed = !task.completed;
+          saveTasks();
+          renderTasks(tasks);
+        });
+
+        // Delete button
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => {
+          tasks = tasks.filter(t => t.id !== task.id);
+          saveTasks();
+          renderTasks(tasks);
+        });
+
+        li.appendChild(span);
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
+      });
+    }
+
+    // Save tasks to localStorage
+    function saveTasks() {
+      localStorage.setItem("todos", JSON.stringify(tasks));
+    }
+
+    // Real-time search filter
+    searchInput.addEventListener("input", () => {
+      const searchText = searchInput.value.toLowerCase();
+      const filteredTasks = tasks.filter(task =>
+        task.text.toLowerCase().includes(searchText)
+      );
+      renderTasks(filteredTasks);
+    });
+  </script>
+
+</body>
+</html>
+# Enhanced Todo List Application
+
+## Features
+- Add a task to the list
+- Mark tasks as completed (strike-through effect)
+- Delete tasks individually
+- Search tasks in real time — only matching tasks remain visible
+- Stores tasks persistently in localStorage as a JSON array
+- Each task object contains:
+  - `id` (unique identifier)
+  - `text`
+  - `completed` status
+
+---
+
+## How to Use
+1. Type a task into the input field and click **Add Task**
+2. Click on a task to mark it **Completed / Incomplete**
+3. Press **Delete** next to any task to remove it
+4. Use the **Search Box** to filter tasks in real time
+5. Refresh the page — your tasks will remain saved (localStorage)
+
+---
+
+##  LocalStorage Structure
+```json
+[
+  {
+    "id": 1717695312310,
+    "text": "Sample task",
+    "completed": false
+  }
+]
